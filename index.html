@@ -48,23 +48,37 @@
   <iframe id="formFrame"></iframe>
 
   <script>
-    function askForForm() {
-      let input = prompt("Enter your Google Form link or ID:");
-      if (!input) return null;
+  function askForForm() {
+    let input = prompt("Enter your Google Form link or ID:");
+    if (!input) return null;
 
-      // If user pasted the full URL
-      if (input.includes("docs.google.com/forms")) {
-        try {
-          let match = input.match(/\/d\/e\/([^/]+)/);
-          if (match) {
-            return match[1];
-          }
-        } catch (e) {}
+    let formId = null;
+
+    // Case 1: Full Google Forms link
+    // Example: https://docs.google.com/forms/d/e/1FAIpQLSdX/viewform
+    if (input.includes("docs.google.com/forms")) {
+      let match = input.match(/\/d\/e\/([^/]+)/);
+      if (match) {
+        formId = match[1];
       }
-
-      // Otherwise treat as ID
-      return input;
     }
+
+    // Case 2: Embed link
+    // Example: https://docs.google.com/forms/d/e/1FAIpQLSdX/viewform?embedded=true
+    if (!formId) {
+      let embedMatch = input.match(/\/e\/([^/]+)/);
+      if (embedMatch) {
+        formId = embedMatch[1];
+      }
+    }
+
+    // Case 3: User pasted just the raw ID
+    if (!formId && /^[a-zA-Z0-9_-]+$/.test(input)) {
+      formId = input;
+    }
+
+    return formId;
+  }
 
     function loadForm() {
       let formId = localStorage.getItem("formId");
@@ -77,6 +91,8 @@
       if (formId) {
         document.getElementById("formFrame").src =
           "https://docs.google.com/forms/d/e/" + formId + "/viewform?embedded=true";
+      } else {
+        alert("Invalid Form ID or link. Please reload and try again.");
       }
     }
 
