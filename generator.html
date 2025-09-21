@@ -11,36 +11,69 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
       margin: 0;
       background: #f0f0f0;
+      padding: 30px;
     }
     h1 {
       margin-bottom: 20px;
     }
-    input {
+    label {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select {
       width: 80%;
       max-width: 500px;
       padding: 10px;
       font-size: 16px;
+      margin-top: 5px;
     }
     button {
-      margin-top: 15px;
-      padding: 10px 20px;
+      margin-top: 20px;
+      padding: 12px 25px;
       font-size: 16px;
       cursor: pointer;
     }
     #output {
-      margin-top: 20px;
+      margin-top: 25px;
       word-break: break-all;
       font-family: monospace;
+    }
+    .icon-preview {
+      margin-top: 10px;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
   <h1>Google Form App Generator</h1>
+
+  <label for="formInput">Google Form Link or ID:</label>
   <input type="text" id="formInput" placeholder="Paste your Google Form link here">
+
+  <label for="appName">App Name:</label>
+  <input type="text" id="appName" placeholder="e.g. Survey, Feedback, etc.">
+
+  <label for="iconColor">Icon Color:</label>
+  <select id="iconColor" onchange="updateIconPreview()">
+    <option value="#1E90FF" selected>Blue</option>
+    <option value="#32CD32">Green</option>
+    <option value="#FF4500">Orange</option>
+    <option value="#FF1493">Pink</option>
+    <option value="#FFD700">Yellow</option>
+    <option value="#8A2BE2">Purple</option>
+    <option value="#000000">Black</option>
+    <option value="#FFFFFF">White</option>
+  </select>
+
+  <div id="iconPreview" class="icon-preview"></div>
+
   <button onclick="generate()">Generate App Link</button>
   <div id="output"></div>
 
@@ -52,18 +85,36 @@
       return null;
     }
 
+    function updateIconPreview() {
+      let color = document.getElementById("iconColor").value;
+      document.getElementById("iconPreview").style.background = color;
+    }
+
     function generate() {
       let input = document.getElementById("formInput").value.trim();
+      let appName = document.getElementById("appName").value.trim();
+      let color = document.getElementById("iconColor").value;
+
       let id = extractFormId(input);
       if (!id) {
-        document.getElementById("output").innerText = "Invalid form link or ID.";
+        document.getElementById("output").innerText = "❌ Invalid form link or ID.";
         return;
       }
-      let link = "form.html?id=" + encodeURIComponent(id);
+
+      if (!appName) {
+        appName = "Form App";
+      }
+
+      // Build link with params
+      let link = `form.html?id=${encodeURIComponent(id)}&name=${encodeURIComponent(appName)}&color=${encodeURIComponent(color)}`;
+
       document.getElementById("output").innerHTML =
-        `<p>✅ App link generated:</p><a href="${link}" target="_blank">${location.origin}/${link}</a><br><br>
+        `<p>✅ App link generated:</p>
+         <a href="${link}" target="_blank">${location.origin}/${link}</a><br><br>
          <small>Open in Safari on iOS → Share → Add to Home Screen</small>`;
     }
+
+    updateIconPreview();
   </script>
 </body>
 </html>
