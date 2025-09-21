@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form App</title>
+
+  <!-- iOS fullscreen web app -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- Default icon (you can replace with your own) -->
+  <link rel="apple-touch-icon" href="forms.png">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #fff;
+    }
+    iframe {
+      border: none;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="formFrame"></iframe>
+
+  <script>
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    let formId = getParam("id");
+    if (!formId) {
+      document.body.innerHTML = "<p style='font-family:sans-serif;text-align:center;margin-top:50px;'>❌ No form ID provided.</p>";
+    } else {
+      let url = "https://docs.google.com/forms/d/e/" + formId + "/viewform?embedded=true";
+      document.getElementById("formFrame").src = url;
+
+      // Fetch form title and set app name
+      fetch(url)
+        .then(r => r.text())
+        .then(html => {
+          let match = html.match(/<title>(.*?)<\/title>/i);
+          if (match) {
+            let title = match[1].replace(" - Google Forms", "");
+            document.title = title;
+          }
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>
