@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
+  <!-- Default fallback -->
   <title>Form App</title>
 
   <!-- iOS fullscreen web app -->
@@ -40,14 +42,14 @@
     let appName = getParam("name") || "Form App";
     let color = getParam("color") || "#1E90FF";
 
+    // ✅ Inject <title> immediately so iOS reads it for Home Screen name
+    document.querySelector("title").innerText = appName;
+
     if (!formId) {
       document.body.innerHTML = "<p style='font-family:sans-serif;text-align:center;margin-top:50px;'>❌ No form ID provided.</p>";
     } else {
       let url = "https://docs.google.com/forms/d/e/" + formId + "/viewform?embedded=true";
       document.getElementById("formFrame").src = url;
-
-      // Set app name
-      document.title = appName;
 
       // Generate solid color icon dynamically
       let canvas = document.createElement("canvas");
