@@ -1,14 +1,92 @@
-<DOCTYPE html>
-  <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="forms.png">
-  </head>
-  <body>
-    <div>
-      
-    </div>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Form App</title>
 
-  
-</DOCTYPE>
+  <!-- iOS Web App settings -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <!-- App icon -->
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #fff;
+      font-family: sans-serif;
+    }
+
+    iframe {
+      border: none;
+      height: 100%;
+      width: 100%;
+    }
+
+    #reset {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div id="reset">↻ Change Form</div>
+  <iframe id="formFrame"></iframe>
+
+  <script>
+    function askForForm() {
+      let input = prompt("Enter your Google Form link or ID:");
+      if (!input) return null;
+
+      // If user pasted the full URL
+      if (input.includes("docs.google.com/forms")) {
+        try {
+          let match = input.match(/\/d\/e\/([^/]+)/);
+          if (match) {
+            return match[1];
+          }
+        } catch (e) {}
+      }
+
+      // Otherwise treat as ID
+      return input;
+    }
+
+    function loadForm() {
+      let formId = localStorage.getItem("formId");
+      if (!formId) {
+        formId = askForForm();
+        if (formId) {
+          localStorage.setItem("formId", formId);
+        }
+      }
+      if (formId) {
+        document.getElementById("formFrame").src =
+          "https://docs.google.com/forms/d/e/" + formId + "/viewform?embedded=true";
+      }
+    }
+
+    // Reset button
+    document.getElementById("reset").addEventListener("click", () => {
+      localStorage.removeItem("formId");
+      location.reload();
+    });
+
+    loadForm();
+  </script>
+</body>
+</html>
