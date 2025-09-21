@@ -9,8 +9,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-  <!-- Default icon (you can replace with your own) -->
-  <link rel="apple-touch-icon" href="forms.png">
+  <!-- App icon will be injected dynamically -->
+  <link id="iconLink" rel="apple-touch-icon" href="">
 
   <style>
     html, body {
@@ -37,23 +37,28 @@
     }
 
     let formId = getParam("id");
+    let appName = getParam("name") || "Form App";
+    let color = getParam("color") || "#1E90FF";
+
     if (!formId) {
       document.body.innerHTML = "<p style='font-family:sans-serif;text-align:center;margin-top:50px;'>❌ No form ID provided.</p>";
     } else {
       let url = "https://docs.google.com/forms/d/e/" + formId + "/viewform?embedded=true";
       document.getElementById("formFrame").src = url;
 
-      // Fetch form title and set app name
-      fetch(url)
-        .then(r => r.text())
-        .then(html => {
-          let match = html.match(/<title>(.*?)<\/title>/i);
-          if (match) {
-            let title = match[1].replace(" - Google Forms", "");
-            document.title = title;
-          }
-        })
-        .catch(() => {});
+      // Set app name
+      document.title = appName;
+
+      // Generate solid color icon dynamically
+      let canvas = document.createElement("canvas");
+      canvas.width = 180;
+      canvas.height = 180;
+      let ctx = canvas.getContext("2d");
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 180, 180);
+      let dataUrl = canvas.toDataURL("image/png");
+
+      document.getElementById("iconLink").setAttribute("href", dataUrl);
     }
   </script>
 </body>
